@@ -105,7 +105,6 @@ class Client(object):
         proxy_handler = None
         proxy = kwargs.pop('proxy', None)
         if proxy:
-            warnings.warn('Proxy support is alpha.', UserWarning)
             parsed_url = compat_urllib_parse_urlparse(proxy)
             if parsed_url.netloc and parsed_url.scheme:
                 if parsed_url.scheme == 'socks5':
@@ -337,21 +336,6 @@ class Client(object):
                 False, False, None, True, None, None, {})
         )
 
-        init_res = self._make_request(
-            'https://www.instagram.com/', return_response=True, get_method=lambda: 'GET')
-        init_res_content = self._read_response(init_res)
-
-        rhx_gis = self._extract_rhx_gis(init_res_content)
-        self.rhx_gis = rhx_gis
-
-        if not self.csrftoken:
-            csrftoken = self._extract_csrftoken(init_res_content)
-            self.init_csrftoken = csrftoken
-
-        if not self.csrftoken:
-            raise ClientError('Unable to get csrf from init request.')
-        if not self.rhx_gis:
-            raise ClientError('Unable to get rhx_gis from init request.')
         # required to avoid 403 when doing unauthenticated requests
         self.cookie_jar.set_cookie(
             compat_cookiejar.Cookie(
